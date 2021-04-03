@@ -1666,6 +1666,7 @@ elseif(WINDOWS)
 
 elseif(APPLE)
   # TODO: rework this all for proper MacOS X, iOS and Darwin support
+  enable_language(OBJC)
 
   # We always need these libs on macOS at the moment.
   # !!! FIXME: we need Carbon for some very old API calls in
@@ -1681,8 +1682,6 @@ elseif(APPLE)
   if(SDL_FILE)
     file(GLOB EXTRA_SOURCES ${SDL2_SOURCE_DIR}/src/file/cocoa/*.m)
     set(SOURCE_FILES ${EXTRA_SOURCES} ${SOURCE_FILES})
-    # !!! FIXME: modern CMake doesn't need "LANGUAGE C" for Objective-C.
-    set_source_files_properties(${EXTRA_SOURCES} PROPERTIES LANGUAGE C)
     set(HAVE_SDL_FILE TRUE)
     # !!! FIXME: why is COREVIDEO inside this if() block?
     set(SDL_FRAMEWORK_COREVIDEO 1)
@@ -1702,8 +1701,6 @@ elseif(APPLE)
   if(SDL_AUDIO)
     set(SDL_AUDIO_DRIVER_COREAUDIO 1)
     file(GLOB AUDIO_SOURCES ${SDL2_SOURCE_DIR}/src/audio/coreaudio/*.m)
-    # !!! FIXME: modern CMake doesn't need "LANGUAGE C" for Objective-C.
-    set_source_files_properties(${AUDIO_SOURCES} PROPERTIES LANGUAGE C)
     set(SOURCE_FILES ${SOURCE_FILES} ${AUDIO_SOURCES})
     set(HAVE_SDL_AUDIO TRUE)
     set(SDL_FRAMEWORK_COREAUDIO 1)
@@ -1726,6 +1723,7 @@ elseif(APPLE)
         set(SDL_FRAMEWORK_COREMOTION 1)
       endif()
       set(SDL_FRAMEWORK_GAMECONTROLLER 1)
+      set(SDL_FRAMEWORK_COREHAPTICS 1)
       set(HAVE_SDL_SENSORS 1)
     else()
       file(GLOB JOYSTICK_SOURCES ${SDL2_SOURCE_DIR}/src/joystick/darwin/*.c ${SDL2_SOURCE_DIR}/src/joystick/iphoneos/*.m)
@@ -1784,8 +1782,6 @@ elseif(APPLE)
   if(SDL_FILESYSTEM)
     set(SDL_FILESYSTEM_COCOA 1)
     file(GLOB FILESYSTEM_SOURCES ${SDL2_SOURCE_DIR}/src/filesystem/cocoa/*.m)
-    # !!! FIXME: modern CMake doesn't need "LANGUAGE C" for Objective-C.
-    set_source_files_properties(${FILESYSTEM_SOURCES} PROPERTIES LANGUAGE C)
     set(SOURCE_FILES ${SOURCE_FILES} ${FILESYSTEM_SOURCES})
     set(HAVE_SDL_FILESYSTEM TRUE)
   endif()
@@ -1949,6 +1945,10 @@ elseif(APPLE)
   if(SDL_FRAMEWORK_UIKIT)
     find_library(UIKIT UIKit)
     list(APPEND EXTRA_LIBS ${UIKIT})
+  endif()
+  if(SDL_FRAMEWORK_COREHAPTICS)
+    find_library(COREHAPTICS CoreHaptics)
+    list(APPEND EXTRA_LIBS ${COREHAPTICS})
   endif()
 
   CheckPTHREAD()
